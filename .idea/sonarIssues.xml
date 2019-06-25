@@ -68,6 +68,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/gabriel/myrecipes/util/Testing.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/com/gabriel/myrecipes/viewmodels/RecipeListViewModel.kt">
           <value>
             <set />

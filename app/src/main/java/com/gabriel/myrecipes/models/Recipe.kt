@@ -4,12 +4,12 @@ import android.os.Parcel
 import android.os.Parcelable
 
 data class Recipe(
-    private val title: String,
-    private val publisher: String,
-    private val ingredients: Array<String>,
-    private val recipe_id: String,
-    private val image_url: String,
-    private val social_rank: Float
+    val title: String,
+    val publisher: String,
+    val ingredients: Array<String>,
+    val recipe_id: String,
+    val image_url: String,
+    val social_rank: Float
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString(),
@@ -19,6 +19,7 @@ data class Recipe(
         parcel.readString(),
         parcel.readFloat()
     )
+
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(title)
         parcel.writeString(publisher)

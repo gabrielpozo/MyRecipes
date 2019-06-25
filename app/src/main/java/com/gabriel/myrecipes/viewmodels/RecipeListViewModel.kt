@@ -6,5 +6,11 @@ import com.gabriel.myrecipes.models.Recipe
 import com.gabriel.myrecipes.repository.RecipeRepository
 
 class RecipeListViewModel : ViewModel() {
-    val mRecipes: MutableLiveData<List<Recipe>> = RecipeRepository.mRecipes
+    private val mRecipeRepository = RecipeRepository
+    val mRecipes: MutableLiveData<MutableList<Recipe>> = mRecipeRepository.mRecipes
+
+    fun searchRecipesApi(query: String, pageNumber: Int) {
+        val page = if (pageNumber == 0) 1 else pageNumber
+        mRecipeRepository.searchRecipesApi(query, page)
+    }
 }

@@ -5,5 +5,11 @@ import com.gabriel.myrecipes.models.Recipe
 import com.gabriel.myrecipes.request.RecipeApiClient
 
 object RecipeRepository {
-    val mRecipes: MutableLiveData<List<Recipe>> = RecipeApiClient.mRecipe
+    private val mRecipeClient = RecipeApiClient
+    val mRecipes: MutableLiveData<MutableList<Recipe>> = mRecipeClient.mRecipe
+
+    fun searchRecipesApi(query: String, pageNumber: Int) {
+        val page = if (pageNumber == 0) 1 else pageNumber
+        mRecipeClient.searchRecipesApi(query, page)
+    }
 }
