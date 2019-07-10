@@ -5,7 +5,6 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
-import android.graphics.Color.parseColor
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.util.Log
@@ -48,11 +47,12 @@ class HorizontalDottedProgress : View {
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         //Animation called when attaching to the window, i.e to your screen
-        startAnimation()
+        startAnimationView()
     }
 
     private fun createDot(canvas: Canvas, paint: Paint) {
-        //here i have setted progress bar with 10 dots , so repeat and wnen i = mDotPosition  then increase the radius of dot i.e mBounceDotRadius
+        //  Log.d("Gabriel", "Create the dots")
+        //here i have settled progress bar with 10 dots , so repeat and when i = mDotPosition  then increase the radius of dot i.e mBounceDotRadius
         for (i in 0 until mDotAmount) {
             if (i == mDotPosition) {
                 //Drawing the big dot
@@ -73,6 +73,7 @@ class HorizontalDottedProgress : View {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+
         val width: Int
         val height: Int
 
@@ -87,7 +88,7 @@ class HorizontalDottedProgress : View {
         setMeasuredDimension(width, height)
     }
 
-    private fun startAnimation() {
+    private fun startAnimationView() {
         val bounceAnimation = BounceAnimation()
         bounceAnimation.duration = 100
         bounceAnimation.repeatCount = Animation.INFINITE
@@ -108,7 +109,6 @@ class HorizontalDottedProgress : View {
                     mDotPosition = 0
                 }
                 Log.d("INFOMETHOD", "----On Animation Repeat----")
-
             }
         })
         startAnimation(bounceAnimation)

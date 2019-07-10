@@ -8,7 +8,7 @@ import com.gabriel.myrecipes.adapters.OnRecipeListener
 import com.gabriel.myrecipes.adapters.RecipeRecyclerViewAdapter
 import com.gabriel.myrecipes.viewmodels.RecipeListViewModel
 import kotlinx.android.synthetic.main.activity_recipe_list.*
-import android.support.v7.widget.SearchView;
+import android.support.v7.widget.SearchView
 
 class RecipeListActivity : BaseActivity(), OnRecipeListener {
     private val mRecipeListViewModel by lazy {
@@ -24,6 +24,9 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         initRecyclerView()
         subscribeObservers()
         initSearchView()
+        if (!mRecipeListViewModel.mIsViewingRecipes) {
+            displaySearchCategories()
+        }
     }
 
     private fun subscribeObservers() {
@@ -47,6 +50,7 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
     private fun initSearchView() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
+                mAdapter.displayLoading()
                 if (query != null) {
                     searchRecipesApi(query, 1)
                 }
@@ -64,5 +68,14 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
     }
 
     override fun onCategoryClick(category: String) {
+        mAdapter.displayLoading()
+        mRecipeListViewModel.searchRecipesApi(category, 1)
     }
+
+    private fun displaySearchCategories() {
+        mRecipeListViewModel.mIsViewingRecipes = false
+        mAdapter.displaySearchCategories()
+    }
+
+
 }

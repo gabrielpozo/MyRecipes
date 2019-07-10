@@ -52,5 +52,7 @@ dependencies {
     annotationProcessor "com.github.bumptech.glide:compiler:$glideVersion"
     //design support library
     implementation "com.android.support:design:$supportVersion"
+    //image-circle view
+    implementation 'de.hdodenhof:circleimageview:3.0.0'
 
 }
