@@ -9,6 +9,7 @@ import com.gabriel.myrecipes.adapters.RecipeRecyclerViewAdapter
 import com.gabriel.myrecipes.viewmodels.RecipeListViewModel
 import kotlinx.android.synthetic.main.activity_recipe_list.*
 import android.support.v7.widget.SearchView
+import com.gabriel.myrecipes.util.VerticalSpacingItemDecorator
 
 class RecipeListActivity : BaseActivity(), OnRecipeListener {
     private val mRecipeListViewModel by lazy {
@@ -38,8 +39,11 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
     }
 
     private fun initRecyclerView() {
+        val itemDecorator = VerticalSpacingItemDecorator(18)
+        recipeRecyclerView.addItemDecoration(itemDecorator)
         recipeRecyclerView.adapter = mAdapter
         recipeRecyclerView.layoutManager = LinearLayoutManager(this)
+
     }
 
     private fun searchRecipesApi(query: String, pageNumber: Int) {
