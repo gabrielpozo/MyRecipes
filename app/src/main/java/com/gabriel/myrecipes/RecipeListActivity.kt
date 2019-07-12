@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import com.gabriel.myrecipes.adapters.OnRecipeListener
 import com.gabriel.myrecipes.adapters.RecipeRecyclerViewAdapter
 import com.gabriel.myrecipes.viewmodels.RecipeListViewModel
@@ -50,6 +51,13 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         recipeRecyclerView.addItemDecoration(itemDecorator)
         recipeRecyclerView.adapter = mAdapter
         recipeRecyclerView.layoutManager = LinearLayoutManager(this)
+        recipeRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if (!recyclerView.canScrollVertically(1)) {
+                    mRecipeListViewModel.searchNextPage()
+                }
+            }
+        })
     }
 
     private fun searchRecipesApi(query: String, pageNumber: Int) {

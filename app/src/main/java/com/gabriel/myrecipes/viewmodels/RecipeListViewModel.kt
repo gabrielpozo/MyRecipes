@@ -18,6 +18,12 @@ class RecipeListViewModel : ViewModel() {
         mRecipeRepository.searchRecipesApi(query, page)
     }
 
+    fun searchNextPage() {
+        if (!mIsPerformingQuery && mIsViewingRecipes) {
+            mRecipeRepository.searchNextPage()
+        }
+    }
+
     fun onBackPressed(): Boolean {
         if (mIsPerformingQuery) {
             mRecipeRepository.cancelRequest()

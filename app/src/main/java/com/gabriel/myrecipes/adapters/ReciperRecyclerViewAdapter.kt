@@ -56,7 +56,8 @@ class RecipeRecyclerViewAdapter(private val mOnRecipeListener: OnRecipeListener)
 
 
     override fun getItemViewType(position: Int) = when {
-        mRecipes?.get(position)?.title.equals("LOADING...") -> loadingType
+        mRecipes?.get(position)?.title.equals("LOADING...") ||
+                position == (mRecipes?.size?.minus(1)) && position != 0 -> loadingType
         mRecipes?.get(position)?.social_rank?.toInt() == -1 -> categoryType
         else -> recipeType
     }
