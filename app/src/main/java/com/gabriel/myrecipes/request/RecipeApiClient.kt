@@ -1,7 +1,6 @@
 package com.gabriel.myrecipes.request
 
 import android.arch.lifecycle.MutableLiveData
-import android.util.Log
 import com.gabriel.myrecipes.AppExecutors
 import com.gabriel.myrecipes.models.Recipe
 import com.gabriel.myrecipes.request.responses.RecipeSearchResponse
@@ -61,15 +60,12 @@ object RecipeApiClient {
         }
 
         fun cancelRequest() {
-            Log.d("Gabriel", "cancelRequest: canceling the search request")
             cancelRequest = true
         }
 
     }
 
     fun cancelRequest() {
-        retrieveRecipesRunnable?.let {
-            it.cancelRequest()
-        }
+        retrieveRecipesRunnable?.cancelRequest()
     }
 }

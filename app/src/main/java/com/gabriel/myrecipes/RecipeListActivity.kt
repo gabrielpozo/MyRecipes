@@ -9,7 +9,8 @@ import com.gabriel.myrecipes.adapters.RecipeRecyclerViewAdapter
 import com.gabriel.myrecipes.viewmodels.RecipeListViewModel
 import kotlinx.android.synthetic.main.activity_recipe_list.*
 import android.support.v7.widget.SearchView
-import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import com.gabriel.myrecipes.util.VerticalSpacingItemDecorator
 
 class RecipeListActivity : BaseActivity(), OnRecipeListener {
@@ -29,6 +30,8 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         if (!mRecipeListViewModel.mIsViewingRecipes) {
             displaySearchCategories()
         }
+
+        setSupportActionBar(toolbar)
     }
 
     private fun subscribeObservers() {
@@ -76,6 +79,8 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
     override fun onCategoryClick(category: String) {
         mAdapter.displayLoading()
         mRecipeListViewModel.searchRecipesApi(category, 1)
+        /**clear focus otherwise back-pressed button won't do its performance */
+        searchView.clearFocus()
     }
 
     private fun displaySearchCategories() {
@@ -89,6 +94,19 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         } else {
             displaySearchCategories()
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.action_categories -> displaySearchCategories()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.recipes_search_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+
     }
 
 }
