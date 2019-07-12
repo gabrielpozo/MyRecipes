@@ -9,6 +9,7 @@ import com.gabriel.myrecipes.adapters.RecipeRecyclerViewAdapter
 import com.gabriel.myrecipes.viewmodels.RecipeListViewModel
 import kotlinx.android.synthetic.main.activity_recipe_list.*
 import android.support.v7.widget.SearchView
+import android.util.Log
 import com.gabriel.myrecipes.util.VerticalSpacingItemDecorator
 
 class RecipeListActivity : BaseActivity(), OnRecipeListener {
@@ -33,17 +34,19 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
     private fun subscribeObservers() {
         mRecipeListViewModel.mRecipes.observe(this, Observer { recipes ->
             if (recipes != null) {
-                mAdapter.setRecipes(recipes.toList())
+                if (mRecipeListViewModel.mIsViewingRecipes) {
+                    mAdapter.setRecipes(recipes.toList())
+                    mRecipeListViewModel.mIsPerformingQuery = false
+                }
             }
         })
     }
 
     private fun initRecyclerView() {
-        val itemDecorator = VerticalSpacingItemDecorator(18)
+        val itemDecorator = VerticalSpacingItemDecorator(22)
         recipeRecyclerView.addItemDecoration(itemDecorator)
         recipeRecyclerView.adapter = mAdapter
         recipeRecyclerView.layoutManager = LinearLayoutManager(this)
-
     }
 
     private fun searchRecipesApi(query: String, pageNumber: Int) {
@@ -68,7 +71,6 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
     }
 
     override fun onRecipeClick(position: Int) {
-
     }
 
     override fun onCategoryClick(category: String) {
@@ -81,5 +83,12 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         mAdapter.displaySearchCategories()
     }
 
+    override fun onBackPressed() {
+        if (mRecipeListViewModel.onBackPressed()) {
+            super.onBackPressed()
+        } else {
+            displaySearchCategories()
+        }
+    }
 
 }

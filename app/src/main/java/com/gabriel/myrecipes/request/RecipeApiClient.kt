@@ -60,10 +60,16 @@ object RecipeApiClient {
             return ServiceGenerator.recipeApi.searchRecipe(Constants.api_key, query, pageNumber.toString())
         }
 
-        private fun cancelRequest(query: String, pageNumber: Int) {
+        fun cancelRequest() {
             Log.d("Gabriel", "cancelRequest: canceling the search request")
             cancelRequest = true
         }
 
+    }
+
+    fun cancelRequest() {
+        retrieveRecipesRunnable?.let {
+            it.cancelRequest()
+        }
     }
 }

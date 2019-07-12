@@ -12,4 +12,8 @@ object RecipeRepository {
         val page = if (pageNumber == 0) 1 else pageNumber
         mRecipeClient.searchRecipesApi(query, page)
     }
+
+    fun cancelRequest() {
+        mRecipeClient.cancelRequest()
+    }
 }
