@@ -2,6 +2,7 @@ package com.gabriel.myrecipes
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -37,12 +38,11 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
 
     private fun subscribeObservers() {
         mRecipeListViewModel.mRecipes.observe(this, Observer { recipes ->
-            if (recipes != null) {
-                if (mRecipeListViewModel.mIsViewingRecipes) {
-                    mAdapter.setRecipes(recipes.toList())
-                    mRecipeListViewModel.mIsPerformingQuery = false
-                }
+            if (recipes != null && mRecipeListViewModel.mIsViewingRecipes) {
+                mAdapter.setRecipes(recipes.toList())
+                mRecipeListViewModel.mIsPerformingQuery = false
             }
+
         })
     }
 
@@ -82,6 +82,9 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
     }
 
     override fun onRecipeClick(position: Int) {
+        val intent = Intent(this, RecipeActivity::class.java)
+        intent.putExtra("recipe", mAdapter.getSelectedItem(position))
+        startActivity(intent)
     }
 
     override fun onCategoryClick(category: String) {

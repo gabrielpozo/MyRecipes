@@ -14,7 +14,7 @@ data class Recipe(
     constructor(parcel: Parcel) : this(
         parcel.readString(),
         parcel.readString(),
-        parcel.createStringArrayList(),
+        arrayListOf<String>().apply { parcel.readArrayList(String::class.java.classLoader) },
         parcel.readString(),
         parcel.readString(),
         parcel.readFloat()

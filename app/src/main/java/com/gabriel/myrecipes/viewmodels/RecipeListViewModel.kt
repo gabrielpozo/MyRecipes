@@ -2,6 +2,7 @@ package com.gabriel.myrecipes.viewmodels
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import android.util.Log
 import com.gabriel.myrecipes.models.Recipe
 import com.gabriel.myrecipes.repository.RecipeRepository
 
@@ -14,12 +15,12 @@ class RecipeListViewModel : ViewModel() {
     fun searchRecipesApi(query: String, pageNumber: Int) {
         mIsViewingRecipes = true
         mIsPerformingQuery = true
-        val page = if (pageNumber == 0) 1 else pageNumber
-        mRecipeRepository.searchRecipesApi(query, page)
+        mRecipeRepository.searchRecipesApi(query, if (pageNumber == 0) 1 else pageNumber)
     }
 
     fun searchNextPage() {
         if (!mIsPerformingQuery && mIsViewingRecipes) {
+            Log.d("Gabriel","search for the next ")
             mRecipeRepository.searchNextPage()
         }
     }

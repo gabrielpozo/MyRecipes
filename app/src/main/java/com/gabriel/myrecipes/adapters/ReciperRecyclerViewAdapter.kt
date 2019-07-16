@@ -55,12 +55,16 @@ class RecipeRecyclerViewAdapter(private val mOnRecipeListener: OnRecipeListener)
     }
 
 
-    override fun getItemViewType(position: Int) = when {
-        mRecipes?.get(position)?.title.equals("LOADING...") ||
-                position == (mRecipes?.size?.minus(1)) && position != 0 -> loadingType
-        mRecipes?.get(position)?.social_rank?.toInt() == -1 -> categoryType
-        else -> recipeType
-    }
+    override fun getItemViewType(position: Int) = mRecipes?.let { recipes ->
+        val value = when {
+            recipes[position].social_rank.toInt() == -1 -> categoryType
+            recipes[position].title == "LOADING..." -> loadingType
+            position == (recipes.size - 1) && position != 0 && recipes[position].title != "EXHAUSTED..." -> loadingType
+
+            else -> recipeType
+        }
+        value
+    } ?: 0
 
     fun displayLoading() {
         if (!isLoading()) {
@@ -82,9 +86,18 @@ class RecipeRecyclerViewAdapter(private val mOnRecipeListener: OnRecipeListener)
                 social_rank = (-1).toFloat()
             )
             categories.add(recipe)
-            mRecipes = categories
-            notifyDataSetChanged()
         }
+        mRecipes = categories
+        notifyDataSetChanged()
+    }
+
+    fun getSelectedItem(position: Int): Recipe? {
+        mRecipes?.let { recipe ->
+            if (recipe.isNotEmpty()) {
+                return recipe[position]
+            }
+        }
+        return null
     }
 
     private fun isLoading(): Boolean {

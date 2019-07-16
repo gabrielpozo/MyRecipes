@@ -3,6 +3,7 @@ package com.gabriel.myrecipes.request
 import android.arch.lifecycle.MutableLiveData
 import com.gabriel.myrecipes.AppExecutors
 import com.gabriel.myrecipes.models.Recipe
+import com.gabriel.myrecipes.request.responses.RecipeResponse
 import com.gabriel.myrecipes.request.responses.RecipeSearchResponse
 import com.gabriel.myrecipes.util.Constants
 import retrofit2.Call
@@ -12,8 +13,11 @@ import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 
 object RecipeApiClient {
-    val mRecipe = MutableLiveData<MutableList<Recipe>>()
+    val mRecipes = MutableLiveData<MutableList<Recipe>>()
     private var retrieveRecipesRunnable: RetrieveRecipesRunnable? = null
+    val mRecipe = MutableLiveData<Recipe>()
+    val mRecipeRequestTimeOut = MutableLiveData<Boolean>()
+    private var retrieveRecipeRunnable: RetrieveRecipeRunnable? = null
 
     fun searchRecipesApi(query: String, pageNumber: Int) {
         retrieveRecipesRunnable?.let { retrieveRecipesRunnable = null }
@@ -22,6 +26,17 @@ object RecipeApiClient {
 
         AppExecutors.mNetworkIO.schedule({
             //let the user know it is timed out
+            handler.cancel(true)
+        }, Constants.network_timeout, TimeUnit.MILLISECONDS)
+    }
+
+    fun searchRecipeById(recipeId: String) {
+        retrieveRecipeRunnable?.let { retrieveRecipeRunnable = null }
+        retrieveRecipeRunnable = RetrieveRecipeRunnable(recipeId)
+        val handler: Future<*> = AppExecutors.mNetworkIO.submit(retrieveRecipeRunnable)
+
+        AppExecutors.mNetworkIO.schedule({
+            mRecipeRequestTimeOut.postValue(true)
             handler.cancel(true)
         }, Constants.network_timeout, TimeUnit.MILLISECONDS)
     }
@@ -39,11 +54,11 @@ object RecipeApiClient {
                     response.body()?.let { recipeSearchResponse ->
                         val listRecipes: MutableList<Recipe> = ArrayList(recipeSearchResponse.recipes)
                         if (pageNumber == 1) {
-                            mRecipe.postValue(listRecipes)
+                            mRecipes.postValue(listRecipes)
                         } else {
-                            val currentRecipes: MutableList<Recipe>? = mRecipe.value
+                            val currentRecipes: MutableList<Recipe>? = mRecipes.value
                             currentRecipes?.addAll(listRecipes)
-
+                            mRecipes.postValue(currentRecipes)
                         }
                     }
                 } else {
@@ -56,7 +71,38 @@ object RecipeApiClient {
         }
 
         private fun getRecipes(query: String, pageNumber: Int): Call<RecipeSearchResponse> {
-            return ServiceGenerator.recipeApi.searchRecipe(Constants.api_key, query, pageNumber.toString())
+            return ServiceGenerator.recipeApi.searchRecipe(Constants.APi_Key9, query, pageNumber.toString())
+        }
+
+        fun cancelRequest() {
+            cancelRequest = true
+        }
+
+    }
+
+    private class RetrieveRecipeRunnable(
+        private val recipeId: String,
+        private var cancelRequest: Boolean = false
+    ) : Runnable {
+        override fun run() {
+            try {
+                val response = getRecipe(recipeId).execute()
+                if (cancelRequest) return
+                if (response.code() == 200) {
+                    response.body()?.let { recipeResponse ->
+                        mRecipe.postValue(recipeResponse.recipe)
+                    }
+                } else {
+                    mRecipes.postValue(null)
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+                mRecipes.postValue(null)
+            }
+        }
+
+        private fun getRecipe(recipeId: String): Call<RecipeResponse> {
+            return ServiceGenerator.recipeApi.getRecipe(Constants.APi_Key9, recipeId)
         }
 
         fun cancelRequest() {

@@ -9,7 +9,7 @@ import android.widget.ProgressBar
 open abstract class BaseActivity : AppCompatActivity() {
 
     private val constraintLayout by lazy { layoutInflater.inflate(R.layout.activity_base, null) as ConstraintLayout }
-    protected val mProgressBar by lazy { constraintLayout.findViewById<ProgressBar>(R.id.progress_bar) }
+    private val mProgressBar: ProgressBar by lazy { constraintLayout.findViewById<ProgressBar>(R.id.progress_bar) }
 
     override fun setContentView(layoutResID: Int) {
         val frameLayout = constraintLayout.findViewById<FrameLayout>(R.id.activity_content)
