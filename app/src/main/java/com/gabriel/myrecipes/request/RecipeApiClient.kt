@@ -71,7 +71,7 @@ object RecipeApiClient {
         }
 
         private fun getRecipes(query: String, pageNumber: Int): Call<RecipeSearchResponse> {
-            return ServiceGenerator.recipeApi.searchRecipe(Constants.APi_Key9, query, pageNumber.toString())
+            return ServiceGenerator.recipeApi.searchRecipe(Constants.API_KEY8, query, pageNumber.toString())
         }
 
         fun cancelRequest() {
@@ -102,7 +102,7 @@ object RecipeApiClient {
         }
 
         private fun getRecipe(recipeId: String): Call<RecipeResponse> {
-            return ServiceGenerator.recipeApi.getRecipe(Constants.APi_Key9, recipeId)
+            return ServiceGenerator.recipeApi.getRecipe(Constants.API_KEY8, recipeId)
         }
 
         fun cancelRequest() {

@@ -47,7 +47,10 @@ class RecipeActivity : BaseActivity() {
         })
 
         mRecipeViewModel.mRecipeRequestTimeOut.observe(this, Observer { timedOut ->
-           
+              if (timedOut != null && timedOut) {
+                  Log.d("Gabriel", " It has timed out first")
+              }
+
         })
     }
 
