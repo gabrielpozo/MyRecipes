@@ -39,10 +39,17 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
     private fun subscribeObservers() {
         mRecipeListViewModel.mRecipes.observe(this, Observer { recipes ->
             if (recipes != null && mRecipeListViewModel.mIsViewingRecipes) {
-                mAdapter.setRecipes(recipes.toList())
+                mAdapter.setRecipes(recipes.toMutableList())
                 mRecipeListViewModel.mIsPerformingQuery = false
             }
+        })
 
+        mRecipeListViewModel.isQueryExhausted.observe(this, Observer { exhausted ->
+            if (exhausted != null) {
+                if (exhausted) {
+                    mAdapter.setQueryExhausted()
+                }
+            }
         })
     }
 

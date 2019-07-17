@@ -1,16 +1,15 @@
 package com.gabriel.myrecipes.viewmodels
 
-import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import android.util.Log
-import com.gabriel.myrecipes.models.Recipe
 import com.gabriel.myrecipes.repository.RecipeRepository
 
 class RecipeListViewModel : ViewModel() {
     private val mRecipeRepository = RecipeRepository
     var mIsViewingRecipes = false
-    val mRecipes: MutableLiveData<MutableList<Recipe>> = mRecipeRepository.mRecipes
+    val mRecipes = mRecipeRepository.mRecipesMediatorLiveData
     var mIsPerformingQuery = false
+    val isQueryExhausted = mRecipeRepository.mIsQueryExhausted
+
 
     fun searchRecipesApi(query: String, pageNumber: Int) {
         mIsViewingRecipes = true
@@ -20,8 +19,11 @@ class RecipeListViewModel : ViewModel() {
 
     fun searchNextPage() {
         if (!mIsPerformingQuery && mIsViewingRecipes) {
-            Log.d("Gabriel","search for the next ")
-            mRecipeRepository.searchNextPage()
+            isQueryExhausted.value?.let { exhausted ->
+                if (!exhausted) {
+                    mRecipeRepository.searchNextPage()
+                }
+            }
         }
     }
 

@@ -13,10 +13,11 @@ import com.gabriel.myrecipes.util.Constants
 
 class RecipeRecyclerViewAdapter(private val mOnRecipeListener: OnRecipeListener) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private var mRecipes: List<Recipe>? = null
+    private var mRecipes: MutableList<Recipe>? = null
     private val recipeType = 1
     private val loadingType = 2
     private val categoryType = 3
+    private val exhaustedType = 4
 
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, itemType: Int): RecyclerView.ViewHolder {
@@ -31,6 +32,12 @@ class RecipeRecyclerViewAdapter(private val mOnRecipeListener: OnRecipeListener)
                 view =
                     LayoutInflater.from(viewGroup.context).inflate(R.layout.layout_loading_list_item, viewGroup, false)
                 return LoadingViewHolder(view)
+            }
+
+            exhaustedType -> {
+                view =
+                    LayoutInflater.from(viewGroup.context).inflate(R.layout.layout_search_exhausted, viewGroup, false)
+                return SearchExhaustedViewHolder(view)
             }
 
             categoryType -> {
@@ -59,8 +66,8 @@ class RecipeRecyclerViewAdapter(private val mOnRecipeListener: OnRecipeListener)
         val value = when {
             recipes[position].social_rank.toInt() == -1 -> categoryType
             recipes[position].title == "LOADING..." -> loadingType
+            recipes[position].title == "EXHAUSTED..." -> exhaustedType
             position == (recipes.size - 1) && position != 0 && recipes[position].title != "EXHAUSTED..." -> loadingType
-
             else -> recipeType
         }
         value
@@ -75,6 +82,26 @@ class RecipeRecyclerViewAdapter(private val mOnRecipeListener: OnRecipeListener)
             notifyDataSetChanged()
         }
 
+    }
+
+    fun setQueryExhausted() {
+        hideLoading()
+        val recipeExhausted = Recipe("EXHAUSTED...")
+        mRecipes?.add(recipeExhausted)
+        notifyDataSetChanged()
+    }
+
+    private fun hideLoading() {
+        if (isLoading()) {
+            mRecipes?.let { recipes ->
+                recipes.forEach {
+                    if (it.title == "LOADING...") {
+                        recipes.remove(it)
+                    }
+                }
+            }
+            notifyDataSetChanged()
+        }
     }
 
     fun displaySearchCategories() {
@@ -139,7 +166,7 @@ class RecipeRecyclerViewAdapter(private val mOnRecipeListener: OnRecipeListener)
 
     }
 
-    fun setRecipes(recipes: List<Recipe>) {
+    fun setRecipes(recipes: MutableList<Recipe>) {
         mRecipes = recipes
         notifyDataSetChanged()
     }
