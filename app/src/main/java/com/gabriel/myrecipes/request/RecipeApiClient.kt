@@ -35,6 +35,7 @@ object RecipeApiClient {
         retrieveRecipeRunnable = RetrieveRecipeRunnable(recipeId)
         val handler: Future<*> = AppExecutors.mNetworkIO.submit(retrieveRecipeRunnable)
 
+        mRecipeRequestTimeOut.value = false
         AppExecutors.mNetworkIO.schedule({
             mRecipeRequestTimeOut.postValue(true)
             handler.cancel(true)
@@ -71,7 +72,7 @@ object RecipeApiClient {
         }
 
         private fun getRecipes(query: String, pageNumber: Int): Call<RecipeSearchResponse> {
-            return ServiceGenerator.recipeApi.searchRecipe(Constants.API_KEY8, query, pageNumber.toString())
+            return ServiceGenerator.recipeApi.searchRecipe(Constants.API_KEY2, query, pageNumber.toString())
         }
 
         fun cancelRequest() {
@@ -102,7 +103,7 @@ object RecipeApiClient {
         }
 
         private fun getRecipe(recipeId: String): Call<RecipeResponse> {
-            return ServiceGenerator.recipeApi.getRecipe(Constants.API_KEY8, recipeId)
+            return ServiceGenerator.recipeApi.getRecipe(Constants.API_KEY2, recipeId)
         }
 
         fun cancelRequest() {

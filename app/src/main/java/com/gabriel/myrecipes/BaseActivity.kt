@@ -6,7 +6,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 
-open abstract class BaseActivity : AppCompatActivity() {
+abstract class BaseActivity : AppCompatActivity() {
 
     private val constraintLayout by lazy { layoutInflater.inflate(R.layout.activity_base, null) as ConstraintLayout }
     private val mProgressBar: ProgressBar by lazy { constraintLayout.findViewById<ProgressBar>(R.id.progress_bar) }
@@ -20,5 +20,4 @@ open abstract class BaseActivity : AppCompatActivity() {
     fun showProgressBar(visibility: Boolean) {
         mProgressBar.visibility = if (visibility) View.VISIBLE else View.GONE
     }
-
 }

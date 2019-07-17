@@ -17,7 +17,6 @@ object RecipeRepository {
     fun searchRecipesApi(querySearch: String, pageNumber: Int) {
         query = querySearch
         page = pageNumber
-        Log.d("Gabriel", "Number of page: $page")
         mRecipeClient.searchRecipesApi(query, page)
     }
 

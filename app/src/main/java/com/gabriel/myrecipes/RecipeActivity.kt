@@ -3,7 +3,6 @@ package com.gabriel.myrecipes
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -30,6 +29,7 @@ class RecipeActivity : BaseActivity() {
         getIncomeIntent()
     }
 
+
     private fun getIncomeIntent() {
         if (intent.hasExtra("recipe")) {
             val recipe = intent.getParcelableExtra<Recipe>("recipe")
@@ -38,18 +38,20 @@ class RecipeActivity : BaseActivity() {
     }
 
     private fun subscribeObservers() {
-        mRecipeViewModel.mRecipe.observe(this, Observer {
-            it?.let { recipe ->
+        mRecipeViewModel.mRecipe.observe(this, Observer { recipe ->
+            if (recipe != null) {
                 if (recipe.recipe_id == mRecipeViewModel.recipeId) {
-                    setRecipeProperties(it)
+                    setRecipeProperties(recipe)
+                    mRecipeViewModel.mRetrievedRecipe = true
                 }
             }
         })
 
+
         mRecipeViewModel.mRecipeRequestTimeOut.observe(this, Observer { timedOut ->
-              if (timedOut != null && timedOut) {
-                  Log.d("Gabriel", " It has timed out first")
-              }
+            if (timedOut != null && timedOut && !mRecipeViewModel.mRetrievedRecipe) {
+                displayErrorScreen("Error retrieving data. Check Network Connection")
+            }
 
         })
     }
@@ -82,6 +84,34 @@ class RecipeActivity : BaseActivity() {
 
     private fun showParent() {
         scrollView.visibility = View.VISIBLE
+    }
+
+    private fun displayErrorScreen(errorMessage: String?) {
+        recipeTitle.text = "Error retrieving recipe..."
+        recipeSocialScore.text = ""
+        val textView = TextView(this)
+        if (errorMessage != null) {
+            textView.text = errorMessage
+        } else {
+            textView.text = "error"
+        }
+
+        textView.textSize = 15f
+        textView.layoutParams =
+            LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        ingredientsContainer.addView(textView)
+
+        val requestOptions = RequestOptions()
+            .placeholder(R.drawable.ic_launcher_background)
+
+        Glide.with(this)
+            .setDefaultRequestOptions(requestOptions)
+            .load(R.drawable.ic_launcher_background)
+            .into(recipeImage)
+
+        showParent()
+        showProgressBar(false)
+
     }
 
 
