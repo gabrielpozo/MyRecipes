@@ -37,18 +37,15 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
     }
 
     private fun subscribeObservers() {
-        mRecipeListViewModel.mRecipes.observe(this, Observer { recipes ->
-            if (recipes != null && mRecipeListViewModel.mIsViewingRecipes) {
-                mAdapter.setRecipes(recipes.toMutableList())
-                mRecipeListViewModel.mIsPerformingQuery = false
-            }
-        })
-
-        mRecipeListViewModel.isQueryExhausted.observe(this, Observer { exhausted ->
-            if (exhausted != null) {
-                if (exhausted) {
-                    mAdapter.setQueryExhausted()
+        mRecipeListViewModel.viewState.observe(this, Observer { viewState ->
+            if (viewState != null) {
+                when (viewState) {
+                    RecipeListViewModel.ViewState.CATEGORIES -> displaySearchCategories()
+                    RecipeListViewModel.ViewState.RECIPES -> {
+                        //recipes will show automatically from the observer
+                    }
                 }
+
             }
         })
     }

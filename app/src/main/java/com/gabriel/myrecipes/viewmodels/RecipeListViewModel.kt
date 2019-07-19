@@ -1,9 +1,21 @@
 package com.gabriel.myrecipes.viewmodels
 
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import com.gabriel.myrecipes.repository.RecipeRepository
 
 class RecipeListViewModel : ViewModel() {
+    enum class ViewState { CATEGORIES, RECIPES }
+
+     val viewState = MutableLiveData<ViewState>()
+
+    init {
+        viewState.value = ViewState.CATEGORIES
+    }
+
+    /****
+     *
+     */
     private val mRecipeRepository = RecipeRepository
     var mIsViewingRecipes = false
     val mRecipes = mRecipeRepository.mRecipesMediatorLiveData

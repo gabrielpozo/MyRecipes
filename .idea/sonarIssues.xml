@@ -88,6 +88,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/gabriel/myrecipes/request/responses/ApiResponse.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/com/gabriel/myrecipes/request/responses/RecipeResponse.kt">
           <value>
             <set />
@@ -104,6 +109,21 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/com/gabriel/myrecipes/util/HorizontalDottedProgress.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/gabriel/myrecipes/util/NetworkBoundResource.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/gabriel/myrecipes/util/Resource.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/gabriel/myrecipes/util/ResourceData.kt">
           <value>
             <set />
           </value>
@@ -179,6 +199,11 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/res/xml/network_security_config.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../Preparation/AndroidTest20/app/src/main/java/com/example/gabrielpozoguzman/androidtest20/common/dependencyinjection/presentation/PresentationComponent.kt">
           <value>
             <set />
           </value>
