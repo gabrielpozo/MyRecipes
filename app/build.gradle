@@ -20,6 +20,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    defaultConfig {
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation":
+                                     "$projectDir/schemas".toString()]
+            }
+        }
+    }
 }
 
 dependencies {
@@ -27,6 +35,7 @@ dependencies {
     def lifecycle_version = "2.0.0"
     def supportVersion = "28.0.0"
     def glideVersion = "4.9.0"
+    def room_version = "1.1.1"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -54,5 +63,9 @@ dependencies {
     implementation "com.android.support:design:$supportVersion"
     //image-circle view
     implementation 'de.hdodenhof:circleimageview:3.0.0'
+    //room
+    implementation "android.arch.persistence.room:runtime:$room_version"
+    annotationProcessor "android.arch.persistence.room:compiler:$room_version"
+    // For Kotlin use kapt instead of annotationProcessor
 
 }

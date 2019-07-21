@@ -23,13 +23,16 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(private val appE
         val dbSource = loadFromDb()
 
         results.addSource(dbSource) { cacheObject ->
+            //stop observing the local db
             results.removeSource(dbSource)
             if (shouldFetch(cacheObject)) {
                 //get data from network
                 fetchFromNetwork(dbSource)
 
             } else {
-                results.value = ResourceData.success()
+                if (results.value != dbSource) {
+                    results.value = ResourceData.success(dbSource.value)
+                }
                 results.addSource(dbSource) { newData ->
                     setValueResource(ResourceData.success(newData))
                 }
@@ -88,7 +91,6 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(private val appE
 
                 is ApiErrorResponse -> {
                     Log.d("Gabriel", "on ApiResponse Error.")
-                    results.value = ResourceData.error("",)
                     results.addSource(dbSource) { newData ->
                         setValueResource(ResourceData.error(requestApiResponse.errorMessage, newData))
                     }

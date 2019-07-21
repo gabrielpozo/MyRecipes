@@ -22,24 +22,24 @@ object RecipeApiClient {
     fun searchRecipesApi(query: String, pageNumber: Int) {
         retrieveRecipesRunnable?.let { retrieveRecipesRunnable = null }
         retrieveRecipesRunnable = RetrieveRecipesRunnable(query, pageNumber)
-        val handler: Future<*> = AppExecutors.mNetworkIO.submit(retrieveRecipesRunnable)
+        //val handler: Future<*> = AppExecutors.mNetworkIO.submit(retrieveRecipesRunnable)
 
-        AppExecutors.mNetworkIO.schedule({
+       /* AppExecutors.mNetworkIO.schedule({
             //let the user know it is timed out
             handler.cancel(true)
-        }, Constants.network_timeout, TimeUnit.MILLISECONDS)
+        }, Constants.network_timeout, TimeUnit.MILLISECONDS)*/
     }
 
     fun searchRecipeById(recipeId: String) {
         retrieveRecipeRunnable?.let { retrieveRecipeRunnable = null }
         retrieveRecipeRunnable = RetrieveRecipeRunnable(recipeId)
-        val handler: Future<*> = AppExecutors.mNetworkIO.submit(retrieveRecipeRunnable)
+      //  val handler: Future<*> = AppExecutors.mNetworkIO.submit(retrieveRecipeRunnable)
 
         mRecipeRequestTimeOut.value = false
-        AppExecutors.mNetworkIO.schedule({
+  /*      AppExecutors.mNetworkIO.schedule({
             mRecipeRequestTimeOut.postValue(true)
             handler.cancel(true)
-        }, Constants.network_timeout, TimeUnit.MILLISECONDS)
+        }, Constants.network_timeout, TimeUnit.MILLISECONDS)*/
     }
 
     private class RetrieveRecipesRunnable(
