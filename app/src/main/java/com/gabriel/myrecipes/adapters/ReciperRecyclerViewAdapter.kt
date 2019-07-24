@@ -1,17 +1,18 @@
 package com.gabriel.myrecipes.adapters
 
-import android.net.Uri
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.RequestManager
 import com.gabriel.myrecipes.R
 import com.gabriel.myrecipes.models.Recipe
 import com.gabriel.myrecipes.util.Constants
 
-class RecipeRecyclerViewAdapter(private val mOnRecipeListener: OnRecipeListener) :
+class RecipeRecyclerViewAdapter(
+    private val mOnRecipeListener: OnRecipeListener,
+    private val requestManager: RequestManager
+) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var mRecipes: MutableList<Recipe>? = null
     private val recipeType = 1
@@ -19,14 +20,13 @@ class RecipeRecyclerViewAdapter(private val mOnRecipeListener: OnRecipeListener)
     private val categoryType = 3
     private val exhaustedType = 4
 
-
     override fun onCreateViewHolder(viewGroup: ViewGroup, itemType: Int): RecyclerView.ViewHolder {
         val view: View
         when (itemType) {
             recipeType -> {
                 view =
                     LayoutInflater.from(viewGroup.context).inflate(R.layout.layout_recipe_list_item, viewGroup, false)
-                return RecipeViewHolder(view, mOnRecipeListener)
+                return RecipeViewHolder(view, mOnRecipeListener, requestManager)
             }
             loadingType -> {
                 view =
@@ -43,12 +43,12 @@ class RecipeRecyclerViewAdapter(private val mOnRecipeListener: OnRecipeListener)
             categoryType -> {
                 view =
                     LayoutInflater.from(viewGroup.context).inflate(R.layout.layout_category_list_item, viewGroup, false)
-                return CategoryViewHolder(view, mOnRecipeListener)
+                return CategoryViewHolder(view, mOnRecipeListener, requestManager)
             }
             else -> {
                 view =
                     LayoutInflater.from(viewGroup.context).inflate(R.layout.layout_recipe_list_item, viewGroup, false)
-                return RecipeViewHolder(view, mOnRecipeListener)
+                return RecipeViewHolder(view, mOnRecipeListener, requestManager)
             }
         }
 
@@ -73,15 +73,26 @@ class RecipeRecyclerViewAdapter(private val mOnRecipeListener: OnRecipeListener)
         value
     } ?: 0
 
+    //display only loading during search request
+    fun displayOnlyLoading() {
+        clearRecipesList()
+        val recipe = Recipe("LOADING...")
+        mRecipes?.add(recipe)
+        notifyDataSetChanged()
+    }
+
+    private fun clearRecipesList() {
+        mRecipes?.clear()
+        notifyDataSetChanged()
+    }
+
+    //pagination loading
     fun displayLoading() {
         if (!isLoading()) {
             val recipe = Recipe("LOADING...")
-            val loadingListItem = arrayListOf<Recipe>()
-            loadingListItem.add(recipe)
-            mRecipes = loadingListItem
+            mRecipes?.add(recipe)
             notifyDataSetChanged()
         }
-
     }
 
     fun setQueryExhausted() {
@@ -91,16 +102,17 @@ class RecipeRecyclerViewAdapter(private val mOnRecipeListener: OnRecipeListener)
         notifyDataSetChanged()
     }
 
-    private fun hideLoading() {
+    fun hideLoading() {
         if (isLoading()) {
             mRecipes?.let { recipes ->
-                recipes.forEach {
-                    if (it.title == "LOADING...") {
-                        recipes.remove(it)
-                    }
+                if (recipes[0].title == "LOADING...") {
+                    recipes.removeAt(0)
+                } else if (recipes[recipes.size - 1].title == "LOADING...") {
+                    recipes.removeAt(recipes.size - 1)
                 }
+                notifyDataSetChanged()
             }
-            notifyDataSetChanged()
+
         }
     }
 
@@ -139,28 +151,13 @@ class RecipeRecyclerViewAdapter(private val mOnRecipeListener: OnRecipeListener)
     override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
         val itemViewType = getItemViewType(position)
         if (itemViewType == recipeType) {
-            val requestOptions = RequestOptions().placeholder(R.drawable.ic_launcher_background)
-            mRecipes?.apply {
-                Glide.with(viewHolder.itemView.context)
-                    .setDefaultRequestOptions(requestOptions)
-                    .load(this[position].image_url)
-                    .into((viewHolder as RecipeViewHolder).image)
-
-                viewHolder.title.text = this[position].title
-                viewHolder.publisher.text = this[position].publisher
-                viewHolder.socialScore.text = Math.round(this[position].social_rank).toString()
+            mRecipes?.let { recipes ->
+                (viewHolder as RecipeViewHolder).onBind(recipes[position])
             }
-        } else if (itemViewType == categoryType) {
-            val requestOptions = RequestOptions().placeholder(R.drawable.ic_launcher_background)
-            mRecipes?.apply {
-                val path =
-                    Uri.parse("android.resource://com.gabriel.myrecipes/drawable/" + get(position).image_url)
-                Glide.with(viewHolder.itemView.context)
-                    .setDefaultRequestOptions(requestOptions)
-                    .load(path)
-                    .into((viewHolder as CategoryViewHolder).categoryImage)
 
-                viewHolder.categoryTitle.text = this[position].title
+        } else if (itemViewType == categoryType) {
+            mRecipes?.let { recipes ->
+                (viewHolder as CategoryViewHolder).onBind(recipes[position])
             }
         }
 

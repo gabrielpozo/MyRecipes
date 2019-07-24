@@ -18,6 +18,12 @@ data class ResourceData<out T>(val status: Status, val data: T?, val message: St
             return ResourceData(Status.LOADING, data, null)
         }
     }
+
+    enum class Status {
+        SUCCESS,
+        ERROR,
+        LOADING
+    }
 }
 
 /**
@@ -27,8 +33,4 @@ data class ResourceData<out T>(val status: Status, val data: T?, val message: St
  * These are usually created by the Repository classes where they return
  * `LiveData<ResourceData<T>>` to pass back the latest data to the UI with its fetch status.
  */
-enum class Status {
-    SUCCESS,
-    ERROR,
-    LOADING
-}
+

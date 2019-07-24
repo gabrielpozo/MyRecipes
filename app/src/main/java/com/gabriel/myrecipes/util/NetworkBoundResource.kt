@@ -84,7 +84,6 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(private val appE
                         results.addSource(loadFromDb()) { newData ->
                             setValueResource(ResourceData.success(newData))
                         }
-
                     }
 
                 }
