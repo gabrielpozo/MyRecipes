@@ -1,53 +1,34 @@
 package com.gabriel.myrecipes.viewmodels
 
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
-import com.gabriel.myrecipes.repository.RecipeRepository
+import android.app.Application
+import androidx.lifecycle.*
+import com.gabriel.myrecipes.models.Recipe
+import com.gabriel.myrecipes.repositories.RecipeRepository
+import com.gabriel.myrecipes.util.Resource
+import com.gabriel.myrecipes.util.ResourceData
 
-class RecipeListViewModel : ViewModel() {
+class RecipeListViewModel(application: Application) : AndroidViewModel(application) {
     enum class ViewState { CATEGORIES, RECIPES }
 
-     val viewState = MutableLiveData<ViewState>()
+    val viewState = MutableLiveData<ViewState>()
+    val recipes = MediatorLiveData<ResourceData<List<Recipe>>>()
+    private val recipeRepository = RecipeRepository(application)
 
     init {
         viewState.value = ViewState.CATEGORIES
     }
 
+
+    fun searchRecipesApi(query: String, pageNumber: Int) {
+        val repositorySource = recipeRepository.searchRecipes(query, pageNumber)
+        recipes.addSource(repositorySource) { listResource ->
+            //react to the data, do something before send it back to the UI
+            recipes.value = listResource
+
+        }
+    }
     /****
      *
      */
-    private val mRecipeRepository = RecipeRepository
-    var mIsViewingRecipes = false
-    val mRecipes = mRecipeRepository.mRecipesMediatorLiveData
-    var mIsPerformingQuery = false
-    val isQueryExhausted = mRecipeRepository.mIsQueryExhausted
 
-
-    fun searchRecipesApi(query: String, pageNumber: Int) {
-        mIsViewingRecipes = true
-        mIsPerformingQuery = true
-        mRecipeRepository.searchRecipesApi(query, if (pageNumber == 0) 1 else pageNumber)
-    }
-
-    fun searchNextPage() {
-        if (!mIsPerformingQuery && mIsViewingRecipes) {
-            isQueryExhausted.value?.let { exhausted ->
-                if (!exhausted) {
-                    mRecipeRepository.searchNextPage()
-                }
-            }
-        }
-    }
-
-    fun onBackPressed(): Boolean {
-        if (mIsPerformingQuery) {
-            mRecipeRepository.cancelRequest()
-            mIsPerformingQuery = false
-        }
-        if (mIsViewingRecipes) {
-            mIsViewingRecipes = false
-            return false
-        }
-        return true
-    }
 }

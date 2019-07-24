@@ -1,13 +1,16 @@
 package com.gabriel.myrecipes.database
 
-import android.arch.persistence.room.*
 import android.content.Context
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
 import com.gabriel.myrecipes.models.Recipe
 
 @Database(entities = [Recipe::class], version = 1)
-@TypeConverters(Converters::class)
 abstract class RecipeDatabase : RoomDatabase() {
     val database_name = "recipe_db"
+
+    abstract fun getRecipeDao(): RecipeDao
 
     companion object {
         @Volatile

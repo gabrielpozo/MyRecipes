@@ -1,6 +1,6 @@
 package com.gabriel.myrecipes.adapters
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.widget.TextView
 import com.gabriel.myrecipes.R

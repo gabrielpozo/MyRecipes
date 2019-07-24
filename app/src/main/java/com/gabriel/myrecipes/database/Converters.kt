@@ -1,12 +1,18 @@
 package com.gabriel.myrecipes.database
 
-import android.arch.persistence.room.TypeConverter
-import com.google.gson.Gson
+import androidx.room.TypeConverter
 
-class Converters {
+object Converters {
     @TypeConverter
-    fun fromString(value: String) = (Gson().fromJson(value, Array<String>::class.java) as Array<String>).toList()
+    @JvmStatic
+    fun stringToStringList(data: String?): List<String>? {
+        return data?.split(",")
+    }
 
     @TypeConverter
-    fun fromArrayList(list: ArrayList<String>) = Gson().toJson(list)
+    @JvmStatic
+    fun stringListToString(strings: List<String>?): String? {
+        return strings?.joinToString(",")
+    }
 }
+

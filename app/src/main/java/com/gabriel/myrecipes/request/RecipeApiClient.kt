@@ -1,6 +1,6 @@
 package com.gabriel.myrecipes.request
 
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.MutableLiveData
 import com.gabriel.myrecipes.AppExecutors
 import com.gabriel.myrecipes.models.Recipe
 import com.gabriel.myrecipes.request.responses.RecipeResponse
@@ -11,7 +11,7 @@ import java.io.IOException
 
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
-
+/**
 object RecipeApiClient {
     val mRecipes = MutableLiveData<MutableList<Recipe>>()
     private var retrieveRecipesRunnable: RetrieveRecipesRunnable? = null
@@ -116,3 +116,4 @@ object RecipeApiClient {
         retrieveRecipesRunnable?.cancelRequest()
     }
 }
+        **/

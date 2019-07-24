@@ -1,7 +1,7 @@
 package com.gabriel.myrecipes
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -32,28 +32,28 @@ class RecipeActivity : BaseActivity() {
 
     private fun getIncomeIntent() {
         if (intent.hasExtra("recipe")) {
-            val recipe = intent.getParcelableExtra<Recipe>("recipe")
-            mRecipeViewModel.searchRecipeById(recipe.recipe_id)
+            //val recipe = intent.getExtra<Recipe>("recipe")
+            //mRecipeViewModel.searchRecipeById(recipe.recipe_id)
         }
     }
 
     private fun subscribeObservers() {
-        mRecipeViewModel.mRecipe.observe(this, Observer { recipe ->
+        /*mRecipeViewModel.mRecipe.observe(this, Observer { recipe ->
             if (recipe != null) {
                 if (recipe.recipe_id == mRecipeViewModel.recipeId) {
                     setRecipeProperties(recipe)
                     mRecipeViewModel.mRetrievedRecipe = true
                 }
             }
-        })
+        })*/
 
 
-        mRecipeViewModel.mRecipeRequestTimeOut.observe(this, Observer { timedOut ->
+    /*    mRecipeViewModel.mRecipeRequestTimeOut.observe(this, Observer { timedOut ->
             if (timedOut != null && timedOut && !mRecipeViewModel.mRetrievedRecipe) {
                 displayErrorScreen("Error retrieving data. Check Network Connection")
             }
 
-        })
+        })*/
     }
 
     private fun setRecipeProperties(recipe: Recipe) {
@@ -69,7 +69,7 @@ class RecipeActivity : BaseActivity() {
         recipeSocialScore.text = recipe.social_rank.roundToInt().toString()
 
         ingredientsContainer.removeAllViews()
-        recipe.ingredients.forEach { ingredient ->
+        recipe.ingredients?.forEach { ingredient ->
             val textView = TextView(this)
             textView.text = ingredient
             textView.textSize = 15f

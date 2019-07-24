@@ -1,9 +1,9 @@
 package com.gabriel.myrecipes.util
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MediatorLiveData
-import android.support.annotation.MainThread
-import android.support.annotation.WorkerThread
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.annotation.MainThread
+import androidx.annotation.WorkerThread
 import android.util.Log
 import com.gabriel.myrecipes.AppExecutors
 import com.gabriel.myrecipes.request.responses.ApiEmptyResponse
@@ -14,7 +14,7 @@ import com.gabriel.myrecipes.request.responses.ApiSuccessResponse
 // CacheObject: Type for the Resource data.
 // RequestObject: Type for the API response.
 abstract class NetworkBoundResource<CacheObject, RequestObject>(private val appExecutors: AppExecutors) {
-    val results = MediatorLiveData<ResourceData<CacheObject>>()
+    private val results = MediatorLiveData<ResourceData<CacheObject>>()
 
     init {
         //update LiveData for loading status
@@ -41,7 +41,7 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(private val appE
     }
 
     /**
-     * 1) observe the local database
+     * 1) observe the local datab
      * 2) if <condition> then query the network
      * 3) stop observing the local db
      * 4) insert new data into local database
@@ -132,5 +132,5 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(private val appE
 
     // Returns a LiveData object that represents the resource that's implemented
     // in the base class.
-    fun asLiveData(): LiveData<CacheObject> = TODO()
+    fun asLiveData(): LiveData<ResourceData<CacheObject>> = results
 }

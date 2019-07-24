@@ -1,16 +1,17 @@
 package com.gabriel.myrecipes
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.gabriel.myrecipes.adapters.OnRecipeListener
 import com.gabriel.myrecipes.adapters.RecipeRecyclerViewAdapter
 import com.gabriel.myrecipes.viewmodels.RecipeListViewModel
 import kotlinx.android.synthetic.main.activity_recipe_list.*
-import android.support.v7.widget.SearchView
+import androidx.appcompat.widget.SearchView
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import com.gabriel.myrecipes.util.VerticalSpacingItemDecorator
@@ -27,16 +28,25 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recipe_list)
         initRecyclerView()
-        subscribeObservers()
         initSearchView()
-        if (!mRecipeListViewModel.mIsViewingRecipes) {
-            displaySearchCategories()
-        }
+        subscribeObservers()
+        /*  if (!mRecipeListViewModel.mIsViewingRecipes) {
+              displaySearchCategories()
+          }*/
 
         setSupportActionBar(toolbar)
     }
 
     private fun subscribeObservers() {
+        mRecipeListViewModel.recipes.observe(this, Observer { listResource ->
+            if (listResource != null) {
+                Log.d("Gabriel", "onChanged on Status: ${listResource.status}")
+
+                if (listResource.data != null) {
+                    Log.d("Gabriel", "${listResource.data} data")
+                }
+            }
+        })
         mRecipeListViewModel.viewState.observe(this, Observer { viewState ->
             if (viewState != null) {
                 when (viewState) {
@@ -55,18 +65,18 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         recipeRecyclerView.addItemDecoration(itemDecorator)
         recipeRecyclerView.adapter = mAdapter
         recipeRecyclerView.layoutManager = LinearLayoutManager(this)
-        recipeRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+    /*    recipeRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 if (!recyclerView.canScrollVertically(1)) {
-                    mRecipeListViewModel.searchNextPage()
+                    // mRecipeListViewModel.searchNextPage()
                 }
             }
-        })
+        })*/
     }
 
     private fun searchRecipesApi(query: String, pageNumber: Int) {
         val page = if (pageNumber == 0) 1 else pageNumber
-        mRecipeListViewModel.searchRecipesApi(query, page)
+          mRecipeListViewModel.searchRecipesApi(query, 1)
     }
 
     private fun initSearchView() {
@@ -87,29 +97,29 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
 
     override fun onRecipeClick(position: Int) {
         val intent = Intent(this, RecipeActivity::class.java)
-        intent.putExtra("recipe", mAdapter.getSelectedItem(position))
+       // intent.putExtra("recipe", mAdapter.getSelectedItem(position))
         startActivity(intent)
     }
 
     override fun onCategoryClick(category: String) {
-        mAdapter.displayLoading()
+       // mAdapter.displayLoading()
         mRecipeListViewModel.searchRecipesApi(category, 1)
-        /**clear focus otherwise back-pressed button won't do its performance */
+        //**clear focus otherwise back-pressed button won't do its performance *//*
         searchView.clearFocus()
     }
 
     private fun displaySearchCategories() {
-        mRecipeListViewModel.mIsViewingRecipes = false
+        //mRecipeListViewModel.mIsViewingRecipes = false
         mAdapter.displaySearchCategories()
     }
 
-    override fun onBackPressed() {
+ /*   override fun onBackPressed() {
         if (mRecipeListViewModel.onBackPressed()) {
             super.onBackPressed()
         } else {
             displaySearchCategories()
         }
-    }
+    }*/
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
