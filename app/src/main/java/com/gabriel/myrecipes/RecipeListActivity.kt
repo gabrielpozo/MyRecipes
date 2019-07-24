@@ -34,10 +34,6 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         initRecyclerView()
         initSearchView()
         subscribeObservers()
-        /*  if (!mRecipeListViewModel.mIsViewingRecipes) {
-              displaySearchCategories()
-          }*/
-
         setSupportActionBar(toolbar)
     }
 
@@ -117,8 +113,7 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
 
     private fun searchRecipesApi(query: String, pageNumber: Int) {
         recipeRecyclerView.smoothScrollToPosition(0)
-        val page = if (pageNumber == 0) 1 else pageNumber
-        mRecipeListViewModel.searchRecipesApi(query, 1)
+        mRecipeListViewModel.searchRecipesApi(query, if (pageNumber == 0) 1 else pageNumber)
         searchView.clearFocus()
     }
 
@@ -156,13 +151,13 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         mAdapter.displaySearchCategories()
     }
 
-    /*   override fun onBackPressed() {
-           if (mRecipeListViewModel.onBackPressed()) {
-               super.onBackPressed()
-           } else {
-               displaySearchCategories()
-           }
-       }*/
+    override fun onBackPressed() {
+        if (mRecipeListViewModel.viewState.value == RecipeListViewModel.ViewState.CATEGORIES) {
+            super.onBackPressed()
+        } else {
+            mRecipeListViewModel.viewState.value = RecipeListViewModel.ViewState.CATEGORIES
+        }
+    }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
