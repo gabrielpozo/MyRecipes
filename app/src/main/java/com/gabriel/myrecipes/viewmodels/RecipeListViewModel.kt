@@ -19,6 +19,7 @@ class RecipeListViewModel(application: Application) : AndroidViewModel(applicati
     private var isPerformingQuery = false
     var pageNumber: Int = 0
     private var query: String = ""
+    private var cancelRequest = false
 
 
     init {
@@ -47,32 +48,44 @@ class RecipeListViewModel(application: Application) : AndroidViewModel(applicati
         viewState.value = ViewState.RECIPES
         val repositorySource = recipeRepository.searchRecipes(query, pageNumber)
         recipes.addSource(repositorySource) { listResource ->
-            //react to the data, do something before send it back to the UI
-            if (listResource != null) {
-                recipes.value = listResource
-                when (listResource.status) {
-                    ResourceData.Status.SUCCESS -> {
-                        isPerformingQuery = false
-                        if (listResource.data != null) {
-                            if (listResource.data.isEmpty()) {
-                                Log.d("Gabriel", "Query is exhausted!")
-                                recipes.value =
-                                    ResourceData(ResourceData.Status.ERROR, listResource.data, queryExhausted)
+            if (!cancelRequest) {
+                //react to the data, do something before send it back to the UI
+                if (listResource != null) {
+                    recipes.value = listResource
+                    when (listResource.status) {
+                        ResourceData.Status.SUCCESS -> {
+                            isPerformingQuery = false
+                            if (listResource.data != null) {
+                                if (listResource.data.isEmpty()) {
+                                    Log.d("Gabriel", "Query is exhausted!")
+                                    recipes.value =
+                                        ResourceData(ResourceData.Status.ERROR, listResource.data, queryExhausted)
+                                }
                             }
+                            recipes.removeSource(repositorySource)
                         }
-                        recipes.removeSource(repositorySource)
-                    }
 
-                    ResourceData.Status.ERROR -> {
-                        isPerformingQuery = false
-                        recipes.removeSource(repositorySource)
+                        ResourceData.Status.ERROR -> {
+                            isPerformingQuery = false
+                            recipes.removeSource(repositorySource)
+                        }
                     }
+                } else {
+                    recipes.removeSource(repositorySource)
                 }
-
             } else {
                 recipes.removeSource(repositorySource)
             }
+        }
 
+    }
+
+    fun cancelSearchRequest() {
+        if (isPerformingQuery) {
+            Log.d("Gabriel", "canceling search request")
+            cancelRequest = true
+            isPerformingQuery = false
+            pageNumber = 1
         }
     }
 

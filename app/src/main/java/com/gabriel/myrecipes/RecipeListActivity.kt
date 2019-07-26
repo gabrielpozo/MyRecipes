@@ -25,7 +25,7 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         ViewModelProviders.of(this).get(RecipeListViewModel::class.java)
     }
     private val mAdapter: RecipeRecyclerViewAdapter by lazy {
-        RecipeRecyclerViewAdapter(this, initGlide())
+        RecipeRecyclerViewAdapter(this, getGlideRequestManager())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,7 +40,7 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
     private fun subscribeObservers() {
         mRecipeListViewModel.recipes.observe(this, Observer { listResource ->
             if (listResource != null) {
-                Log.d("Gabriel", "onChanged on Status: ${listResource.status}")
+                Log.d("Gabriel", "onChanged on Status Response!!: ${listResource.status}")
                 if (listResource.data != null) {
                     when (listResource.status) {
                         ResourceData.Status.LOADING -> {
@@ -51,10 +51,6 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
                             }
                         }
                         ResourceData.Status.ERROR -> {
-                            Log.d(
-                                "Gabriel",
-                                "can not refresh the cache, number of recipes returned: ${listResource.data.size} "
-                            )
                             mAdapter.hideLoading()
                             mAdapter.setRecipes(listResource.data.toMutableList())
                             if (listResource.message.equals("No more results")) {
@@ -86,7 +82,7 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         })
     }
 
-    private fun initGlide(): RequestManager {
+    private fun getGlideRequestManager(): RequestManager {
         val options = RequestOptions()
             .placeholder(R.drawable.white_background)
             .error(R.drawable.white_background)
@@ -155,6 +151,7 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         if (mRecipeListViewModel.viewState.value == RecipeListViewModel.ViewState.CATEGORIES) {
             super.onBackPressed()
         } else {
+            mRecipeListViewModel.cancelSearchRequest()
             mRecipeListViewModel.viewState.value = RecipeListViewModel.ViewState.CATEGORIES
         }
     }

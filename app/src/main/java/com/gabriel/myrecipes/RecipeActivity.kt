@@ -1,6 +1,5 @@
 package com.gabriel.myrecipes
 
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.view.View

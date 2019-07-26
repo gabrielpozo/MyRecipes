@@ -10,8 +10,6 @@ import com.bumptech.glide.request.RequestOptions
 import com.gabriel.myrecipes.R
 import com.gabriel.myrecipes.models.Recipe
 
-//import kotlinx.android.synthetic.main.layout_recipe_list_item.view.*
-
 class RecipeViewHolder(
     itemView: View,
     private val onRecipeListener: OnRecipeListener,
