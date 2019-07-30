@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
-import android.util.Log
 import com.gabriel.myrecipes.AppExecutors
 import com.gabriel.myrecipes.request.responses.ApiEmptyResponse
 import com.gabriel.myrecipes.request.responses.ApiErrorResponse
@@ -28,9 +27,7 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(private val appE
             if (shouldFetch(cacheObject)) {
                 //get data from network
                 fetchFromNetwork(dbSource)
-
             } else {
-                Log.d("Gabriel2", "it is equal on data source")
                 results.addSource(dbSource) { cacheObject ->
                     setValueResource(ResourceData.success(cacheObject))
                 }
@@ -69,7 +66,11 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(private val appE
                         //We request again a new live data
                         appExecutors.mainThreadExecutor.execute {
                             results.addSource(loadFromDb()) { newCacheObject ->
-                                setValueResource(ResourceData.success(newCacheObject))
+                                if (!isApiCallExhausted(requestApiResponse.body)) {
+                                    setValueResource(ResourceData.success(newCacheObject))
+                                } else {
+                                    setValueResource(ResourceData.exhausted(newCacheObject))
+                                }
                             }
                         }
                     }
@@ -81,7 +82,6 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(private val appE
                             setValueResource(ResourceData.success(cacheData))
                         }
                     }
-
                 }
 
                 is ApiErrorResponse -> {
@@ -95,10 +95,13 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(private val appE
 
     }
 
+    open fun isApiCallExhausted(cacheObject: RequestObject): Boolean {
+        return false
+    }
+
     @WorkerThread
     private fun processResponse(response: ApiSuccessResponse<RequestObject>): RequestObject {
         return response.body
-
     }
 
     private fun setValueResource(newValue: ResourceData<CacheObject>) {

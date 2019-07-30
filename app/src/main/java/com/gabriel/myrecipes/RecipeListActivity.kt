@@ -52,21 +52,22 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
                                 mAdapter.displayOnlyLoading()
                             }
                         }
+
                         ResourceData.Status.ERROR -> {
                             Toast.makeText(this, "${listResource.message}", Toast.LENGTH_LONG).show()
                             mAdapter.hideLoading()
-
                             mAdapter.setRecipes(listResource.data.toMutableList())
-                            if (listResource.message.equals("No more results...")) {
-                                mAdapter.setQueryExhausted()
-                            }
+                        }
+
+                        ResourceData.Status.EXHAUSTED -> {
+                            mAdapter.hideLoading()
+                            mAdapter.setQueryExhausted()
                         }
 
                         ResourceData.Status.SUCCESS -> {
                             mAdapter.hideLoading()
                             mAdapter.setRecipes(listResource.data.toMutableList())
                         }
-
 
                     }
                 }

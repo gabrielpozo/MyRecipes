@@ -39,8 +39,7 @@ class RecipeRepository(context: Context) {
             }
 
             override fun shouldFetch(data: List<Recipe>?): Boolean {
-                //always query the network since the queries can be anything
-                return !repoRateLimitPagination.isReachLimit
+                return true //always query the network since the queries can be anything
             }
 
             override fun loadFromDb(): LiveData<List<Recipe>> {
@@ -48,7 +47,14 @@ class RecipeRepository(context: Context) {
             }
 
             override fun createCall(): LiveData<ApiResponse<RecipeSearchResponse>> {
-                return ServiceGenerator.recipeApi.searchRecipe(Constants.api_key, query, pageNumber.toString())
+                return ServiceGenerator.recipeApi.searchRecipe(Constants.API_KEY5, query, pageNumber.toString())
+            }
+
+            override fun isApiCallExhausted(recipeSearchResponse: RecipeSearchResponse): Boolean {
+                if (recipeSearchResponse.recipes.isEmpty()) {
+                    return true
+                }
+                return false
             }
 
         }.asLiveData()
@@ -78,7 +84,7 @@ class RecipeRepository(context: Context) {
             }
 
             override fun createCall(): LiveData<ApiResponse<RecipeResponse>> {
-                return ServiceGenerator.recipeApi.getRecipe(Constants.api_key, recipeId)
+                return ServiceGenerator.recipeApi.getRecipe(Constants.API_KEY5, recipeId)
             }
 
         }.asLiveData()

@@ -17,18 +17,10 @@ sealed class ApiResponse<T> {
         fun <T> create(response: Response<T>): ApiResponse<T> {
             return if (response.isSuccessful) {
                 val body = response.body()
-                if (body is RecipeSearchResponse) {
-                    if (!CheckRecipeApiKey.isRecipeKeyValid(body as RecipeSearchResponse)) {
-                        val errorMessage = "Api key is invalid or expired"
-                        return ApiErrorResponse(errorMessage)
-                    }
-                }
 
-                if (body is RecipeResponse) {
-                    if (!CheckRecipeApiKey.isRecipeKeyValid(body as RecipeResponse)) {
-                        val errorMessage = "Api key is invalid or expired"
-                        return ApiErrorResponse(errorMessage)
-                    }
+                if (!CheckRecipeApiKey.isRecipeKeyValid(body)) {
+                    val errorMessage = "Api key is invalid or expired"
+                    return ApiErrorResponse(errorMessage)
                 }
 
                 if (body == null || response.code() == 204) {// 204 is an empty response code

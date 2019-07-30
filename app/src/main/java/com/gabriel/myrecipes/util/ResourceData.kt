@@ -17,12 +17,17 @@ data class ResourceData<out T>(val status: Status, val data: T?, val message: St
         fun <T> loading(data: T?): ResourceData<T> {
             return ResourceData(Status.LOADING, data, null)
         }
+
+        fun <T> exhausted(data: T?): ResourceData<T> {
+            return ResourceData(Status.EXHAUSTED, data, null)
+        }
     }
 
     enum class Status {
         SUCCESS,
         ERROR,
-        LOADING
+        LOADING,
+        EXHAUSTED
     }
 }
 

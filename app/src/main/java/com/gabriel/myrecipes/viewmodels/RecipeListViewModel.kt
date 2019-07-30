@@ -13,7 +13,6 @@ class RecipeListViewModel(application: Application) : AndroidViewModel(applicati
     val viewState = MutableLiveData<ViewState>()
     val recipes = MediatorLiveData<ResourceData<List<Recipe>>>()
     private val recipeRepository = RecipeRepository(application)
-    val queryExhausted = "No more results..."
     //query extras
     private var isQueryExhausted: Boolean = false
     private var isPerformingQuery = false
@@ -52,43 +51,27 @@ class RecipeListViewModel(application: Application) : AndroidViewModel(applicati
         recipes.addSource(repositorySource) { listResource ->
             if (!cancelRequest) {
                 //react to the data, do something before send it back to the UI
+                Log.d("Gabriel", "recipes.value -before assigining data-, data ${recipes.value?.data?.size}")
                 if (listResource != null) {
                     recipes.value = listResource
-                    Log.d("Gabriel", "get the size of listResource of data FIRST - 1 ${listResource.data?.size} ")
-                    Log.d(
-                        "Gabriel",
-                        "get the size of recipes.value.data.size of data FIRST - 2 ${recipes.value?.data?.size} "
-                    )
+                    Log.d("Gabriel", "listResource, data ${listResource.data?.size}")
+                    Log.d("Gabriel", "recipes.value, data ${recipes.value?.data?.size}")
                     when (listResource.status) {
                         ResourceData.Status.SUCCESS -> {
                             isPerformingQuery = false
-                            if (listResource.data != null) {
-                                Log.d(
-                                    "Gabriel",
-                                    "get the size of listResource of data SECOND - 1 ${listResource.data.size} "
-                                )
-                                Log.d(
-                                    "Gabriel",
-                                    "get the size of  recipes.value.data.size of data SECOND - 2 ${recipes.value?.data?.size} "
-                                )
-                                if (listResource.data.isEmpty()) {
-                                    Log.d(
-                                        "Gabriel",
-                                        "FINALLY INSIDE value of recipe.value ${recipes.value?.data?.size} and value of listResource.data ${listResource.data.size} "
-                                    )
-                                    recipes.value =
-                                        ResourceData(ResourceData.Status.ERROR, listResource.data, queryExhausted)
-                                    isQueryExhausted = true
-                                }
-                            }
                             recipes.removeSource(repositorySource)
                         }
 
                         ResourceData.Status.ERROR -> {
-                            Log.d(
-                                "Gabriel",
-                                "onChanged: Request Time ERROR CASE ${(System.currentTimeMillis() - requestStartTime) / 1000} seconds"
-                            )
+                            if (listResource.data == null) {
+                                isQueryExhausted = true
+                            }
+                            isPerformingQuery = false
+                            recipes.removeSource(repositorySource)
+                        }
+
+                        ResourceData.Status.EXHAUSTED -> {
+                            isQueryExhausted = true
                             isPerformingQuery = false
                             recipes.removeSource(repositorySource)
                         }
