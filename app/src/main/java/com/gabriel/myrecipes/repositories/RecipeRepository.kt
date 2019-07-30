@@ -2,7 +2,6 @@ package com.gabriel.myrecipes.repositories
 
 import androidx.lifecycle.LiveData
 import android.content.Context
-import android.util.Log
 import com.gabriel.myrecipes.AppExecutors
 import com.gabriel.myrecipes.database.RecipeDatabase
 import com.gabriel.myrecipes.models.Recipe
@@ -12,10 +11,12 @@ import com.gabriel.myrecipes.request.responses.RecipeResponse
 import com.gabriel.myrecipes.request.responses.RecipeSearchResponse
 import com.gabriel.myrecipes.util.Constants
 import com.gabriel.myrecipes.util.NetworkBoundResource
+import com.gabriel.myrecipes.util.RepoRateLimitPagination
 import com.gabriel.myrecipes.util.ResourceData
 
 class RecipeRepository(context: Context) {
     private val recipeDao = RecipeDatabase.invoke(context).getRecipeDao()
+    private val repoRateLimitPagination = RepoRateLimitPagination()
 
     fun searchRecipes(query: String, pageNumber: Int): LiveData<ResourceData<List<Recipe>>> {
         return object : NetworkBoundResource<List<Recipe>, RecipeSearchResponse>(AppExecutors()) {
@@ -33,21 +34,21 @@ class RecipeRepository(context: Context) {
                             item.recipes[index].image_url,
                             item.recipes[index].social_rank
                         )
-
                     }
                 }
             }
 
             override fun shouldFetch(data: List<Recipe>?): Boolean {
-                return true //always query the network since the queries can be anything
+                //always query the network since the queries can be anything
+                return !repoRateLimitPagination.isReachLimit
             }
 
             override fun loadFromDb(): LiveData<List<Recipe>> {
-                return recipeDao.searchRecipes(query, pageNumber)
+                return recipeDao.searchRecipes(query, pageNumber, repoRateLimitPagination.pageNumberLimit)
             }
 
             override fun createCall(): LiveData<ApiResponse<RecipeSearchResponse>> {
-                return ServiceGenerator.recipeApi.searchRecipe(Constants.API_KEY7, query, pageNumber.toString())
+                return ServiceGenerator.recipeApi.searchRecipe(Constants.api_key, query, pageNumber.toString())
             }
 
         }.asLiveData()
@@ -57,25 +58,16 @@ class RecipeRepository(context: Context) {
     fun searchRecipeApi(recipeId: String): LiveData<ResourceData<Recipe>> {
         return object : NetworkBoundResource<Recipe, RecipeResponse>(AppExecutors()) {
             override fun saveCallResult(item: RecipeResponse) {
-                item.recipe.timestamp = System.currentTimeMillis().toInt() / 1000
+                item.recipe.timestamp = (System.currentTimeMillis() / 1000).toInt()
                 recipeDao.insertRecipe(item.recipe)
             }
 
             override fun shouldFetch(data: Recipe?): Boolean {
-                Log.d("Gabriel", "shouldFetch recipe: ${data.toString()}")
-                val currentTime = (System.currentTimeMillis() / 100).toInt()
-                Log.d("Gabriel", "currentTime $currentTime")
+                val currentTime = (System.currentTimeMillis() / 1000).toInt()
                 if (data != null) {
                     val lastRefresh = data.timestamp
-                    Log.d(
-                        "Gabriel",
-                        "shouldFetch: its been ${(currentTime - lastRefresh) / 60 / 60 / 24} days since this recipe was refresh." +
-                                " 15 days must elapse before refreshing"
-                    )
-                    if (currentTime - lastRefresh >= Constants.recipe_refresh_time) {
-                        Log.d("Gabriel", "shouldFetch: SHOULD REFRESH RECIPE")
+                    if ((currentTime - lastRefresh) >= Constants.recipe_refresh_time) {
                         return true
-
                     }
                 }
                 return false
@@ -86,7 +78,7 @@ class RecipeRepository(context: Context) {
             }
 
             override fun createCall(): LiveData<ApiResponse<RecipeResponse>> {
-                return ServiceGenerator.recipeApi.getRecipe(Constants.API_KEY7, recipeId)
+                return ServiceGenerator.recipeApi.getRecipe(Constants.api_key, recipeId)
             }
 
         }.asLiveData()

@@ -138,7 +138,7 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
 
     override fun onRecipeClick(position: Int) {
         val intent = Intent(this, RecipeActivity::class.java)
-        // intent.putExtra("recipe", mAdapter.getSelectedItem(position))
+        intent.putExtra("recipe", mAdapter.getSelectedItem(position))
         startActivity(intent)
     }
 

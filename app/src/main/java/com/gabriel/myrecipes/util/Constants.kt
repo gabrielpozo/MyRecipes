@@ -16,7 +16,7 @@ class Constants {
         const val APi_Key9 = "bb403d73d77a2c74fdf8744145c5c86d"
         const val connection_timeout = 10L //10 seconds
         const val recipe_refresh_time = 60 * 60 * 24 * 15 //15 days(in seconds)
-        const val read_timeout = 2L// 10 seconds
+        const val read_timeout = 3L// 10 seconds
         const val write_timeout = 2L
         val default_search_category_images =
             arrayOf("barbeque", "breakfast", "chicken", "beef", "brunch", "dinner", "wine", "italian")

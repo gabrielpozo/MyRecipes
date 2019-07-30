@@ -1,19 +1,18 @@
 package com.gabriel.myrecipes.viewmodels
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import com.gabriel.myrecipes.models.Recipe
 import com.gabriel.myrecipes.repositories.RecipeRepository
+import com.gabriel.myrecipes.util.ResourceData
 
-class RecipeViewModel : ViewModel() {
-/*    private val mRecipeRepository = RecipeRepository
-    val mRecipe: MutableLiveData<Recipe> = mRecipeRepository.mRecipe
-    val mRecipeRequestTimeOut = mRecipeRepository.mRecipeRequestTimeOut
-    var recipeId: String = ""
-    var mRetrievedRecipe: Boolean = false
+class RecipeViewModel(application: Application) : AndroidViewModel(application) {
+    private val recipeRepository = RecipeRepository(application)
 
-    fun searchRecipeById(id: String) {
-        recipeId = id
-        mRecipeRepository.searchRecipeById(id)
-    }*/
+
+    fun searchRecipeApi(recipeId: String): LiveData<ResourceData<Recipe>> {
+        return recipeRepository.searchRecipeApi(recipeId)
+    }
+
 }

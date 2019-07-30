@@ -30,11 +30,9 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(private val appE
                 fetchFromNetwork(dbSource)
 
             } else {
-                if (results.value != dbSource) {
-                    results.value = ResourceData.success(dbSource.value)
-                }
-                results.addSource(dbSource) { newData ->
-                    setValueResource(ResourceData.success(newData))
+                Log.d("Gabriel2", "it is equal on data source")
+                results.addSource(dbSource) { cacheObject ->
+                    setValueResource(ResourceData.success(cacheObject))
                 }
             }
         }
@@ -65,7 +63,6 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(private val appE
              */
             when (requestApiResponse) {
                 is ApiSuccessResponse -> {
-                    Log.d("Gabriel", "on ApiResponse Success.")
                     appExecutors.mDiskIO.execute {
                         //save the response to the local database
                         saveCallResult(processResponse(requestApiResponse))
@@ -79,7 +76,6 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(private val appE
                 }
 
                 is ApiEmptyResponse -> {
-                    Log.d("Gabriel", "on ApiResponse Empty.")
                     appExecutors.mainThreadExecutor.execute {
                         results.addSource(loadFromDb()) { cacheData ->
                             setValueResource(ResourceData.success(cacheData))
@@ -89,7 +85,6 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(private val appE
                 }
 
                 is ApiErrorResponse -> {
-                    Log.d("Gabriel", "on ApiResponse Error.")
                     results.addSource(dbSource) { cacheData ->
                         setValueResource(ResourceData.error(requestApiResponse.errorMessage, cacheData))
                     }

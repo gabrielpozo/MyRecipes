@@ -6,9 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.gabriel.myrecipes.models.Recipe
+import com.gabriel.myrecipes.util.ResourceData
 import com.gabriel.myrecipes.viewmodels.RecipeViewModel
 import kotlinx.android.synthetic.main.activity_recipe.*
 import kotlin.math.roundToInt
@@ -24,35 +26,40 @@ class RecipeActivity : BaseActivity() {
         setContentView(R.layout.activity_recipe)
 
         showProgressBar(true)
-        subscribeObservers()
         getIncomeIntent()
     }
 
 
     private fun getIncomeIntent() {
         if (intent.hasExtra("recipe")) {
-            //val recipe = intent.getExtra<Recipe>("recipe")
-            //mRecipeViewModel.searchRecipeById(recipe.recipe_id)
+            val recipe = intent.getParcelableExtra<Recipe>("recipe")
+            subscribeObservers(recipe.recipe_id)
         }
     }
 
-    private fun subscribeObservers() {
-        /*mRecipeViewModel.mRecipe.observe(this, Observer { recipe ->
-            if (recipe != null) {
-                if (recipe.recipe_id == mRecipeViewModel.recipeId) {
-                    setRecipeProperties(recipe)
-                    mRecipeViewModel.mRetrievedRecipe = true
+    private fun subscribeObservers(recipeId: String) {
+        mRecipeViewModel.searchRecipeApi(recipeId).observe(this, Observer { recipeResource ->
+            if (recipeResource != null) {
+                if (recipeResource.data != null) {
+                    when (recipeResource.status) {
+                        ResourceData.Status.LOADING -> {
+
+                        }
+                        ResourceData.Status.ERROR -> {
+                            showParent()
+                            showProgressBar(false)
+                            setRecipeProperties(recipeResource.data)
+                        }
+                        ResourceData.Status.SUCCESS -> {
+                            showParent()
+                            showProgressBar(false)
+                            setRecipeProperties(recipeResource.data)
+                        }
+                    }
                 }
             }
-        })*/
 
-
-    /*    mRecipeViewModel.mRecipeRequestTimeOut.observe(this, Observer { timedOut ->
-            if (timedOut != null && timedOut && !mRecipeViewModel.mRetrievedRecipe) {
-                displayErrorScreen("Error retrieving data. Check Network Connection")
-            }
-
-        })*/
+        })
     }
 
     private fun setRecipeProperties(recipe: Recipe) {
@@ -66,19 +73,23 @@ class RecipeActivity : BaseActivity() {
 
         recipeTitle.text = (recipe.title)
         recipeSocialScore.text = recipe.social_rank.roundToInt().toString()
+        setIngredients(recipe)
+    }
 
-        ingredientsContainer.removeAllViews()
-        recipe.ingredients?.forEach { ingredient ->
-            val textView = TextView(this)
-            textView.text = ingredient
-            textView.textSize = 15f
-            textView.layoutParams =
-                LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-            ingredientsContainer.addView(textView)
+    private fun setIngredients(recipe: Recipe) {
+        if (recipe.ingredients != null) {
+            ingredientsContainer.removeAllViews()
+            recipe.ingredients?.forEach { ingredient ->
+                val textView = TextView(this)
+                textView.text = ingredient
+                textView.textSize = 15f
+                textView.layoutParams =
+                    LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                ingredientsContainer.addView(textView)
+            }
+        } else {
+            displayErrorScreen("Error retrieving ingredients...\n check network connection")
         }
-
-        showParent()
-        showProgressBar(false)
     }
 
     private fun showParent() {
@@ -86,7 +97,7 @@ class RecipeActivity : BaseActivity() {
     }
 
     private fun displayErrorScreen(errorMessage: String?) {
-        recipeTitle.text = "Error retrieving recipe..."
+        recipeTitle.text = errorMessage
         recipeSocialScore.text = ""
         val textView = TextView(this)
         if (errorMessage != null) {
@@ -99,17 +110,13 @@ class RecipeActivity : BaseActivity() {
         textView.layoutParams =
             LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         ingredientsContainer.addView(textView)
+        /* val requestOptions = RequestOptions()
+             .placeholder(R.drawable.ic_launcher_background)
 
-        val requestOptions = RequestOptions()
-            .placeholder(R.drawable.ic_launcher_background)
-
-        Glide.with(this)
-            .setDefaultRequestOptions(requestOptions)
-            .load(R.drawable.ic_launcher_background)
-            .into(recipeImage)
-
-        showParent()
-        showProgressBar(false)
+         Glide.with(this)
+             .setDefaultRequestOptions(requestOptions)
+             .load(R.drawable.ic_launcher_background)
+             .into(recipeImage)*/
 
     }
 
