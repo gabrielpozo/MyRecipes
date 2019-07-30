@@ -2,21 +2,21 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "3cf251a2f5866f1450be475b2952ac18",
+    "identityHash": "137eee1054fd85b12bbbfcd06fcc1e53",
     "entities": [
       {
         "tableName": "recipes",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`title` TEXT NOT NULL, `recipe_id` TEXT NOT NULL, `publisher` TEXT NOT NULL, `image_url` TEXT NOT NULL, `social_rank` REAL NOT NULL, `ingredients` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`title`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`recipe_id` TEXT NOT NULL, `title` TEXT NOT NULL, `publisher` TEXT NOT NULL, `image_url` TEXT NOT NULL, `social_rank` REAL NOT NULL, `ingredients` TEXT, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`recipe_id`))",
         "fields": [
           {
-            "fieldPath": "title",
-            "columnName": "title",
+            "fieldPath": "recipe_id",
+            "columnName": "recipe_id",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "recipe_id",
-            "columnName": "recipe_id",
+            "fieldPath": "title",
+            "columnName": "title",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -42,7 +42,7 @@
             "fieldPath": "ingredients",
             "columnName": "ingredients",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "timestamp",
@@ -53,7 +53,7 @@
         ],
         "primaryKey": {
           "columnNames": [
-            "title"
+            "recipe_id"
           ],
           "autoGenerate": false
         },
@@ -64,7 +64,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3cf251a2f5866f1450be475b2952ac18')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '137eee1054fd85b12bbbfcd06fcc1e53')"
     ]
   }
 }

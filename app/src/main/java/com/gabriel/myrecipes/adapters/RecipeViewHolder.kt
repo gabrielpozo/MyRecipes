@@ -5,15 +5,18 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.widget.TextView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.ListPreloader
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.util.ViewPreloadSizeProvider
 import com.gabriel.myrecipes.R
 import com.gabriel.myrecipes.models.Recipe
 
 class RecipeViewHolder(
     itemView: View,
     private val onRecipeListener: OnRecipeListener,
-    private val requestManager: RequestManager
+    private val requestManager: RequestManager,
+    private val preloadSizeProvider: ViewPreloadSizeProvider<String>
 ) :
     RecyclerView.ViewHolder(itemView),
     View.OnClickListener {
@@ -36,6 +39,7 @@ class RecipeViewHolder(
         title.text = recipe.title
         publisher.text = recipe.publisher
         socialScore.text = Math.round(recipe.social_rank).toString()
+        preloadSizeProvider.setView(image)
     }
 
 }

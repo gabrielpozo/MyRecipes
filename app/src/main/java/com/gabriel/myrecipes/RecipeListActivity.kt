@@ -11,21 +11,24 @@ import com.gabriel.myrecipes.adapters.RecipeRecyclerViewAdapter
 import com.gabriel.myrecipes.viewmodels.RecipeListViewModel
 import kotlinx.android.synthetic.main.activity_recipe_list.*
 import androidx.appcompat.widget.SearchView
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.util.ViewPreloadSizeProvider
 import com.gabriel.myrecipes.util.ResourceData
 import com.gabriel.myrecipes.util.VerticalSpacingItemDecorator
 
 class RecipeListActivity : BaseActivity(), OnRecipeListener {
+    private val viewPreloadSizeProvider = ViewPreloadSizeProvider<String>()
     private val mRecipeListViewModel by lazy {
         ViewModelProviders.of(this).get(RecipeListViewModel::class.java)
     }
     private val mAdapter: RecipeRecyclerViewAdapter by lazy {
-        RecipeRecyclerViewAdapter(this, getGlideRequestManager())
+        RecipeRecyclerViewAdapter(this, getGlideRequestManager(), viewPreloadSizeProvider)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,7 +43,6 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
     private fun subscribeObservers() {
         mRecipeListViewModel.recipes.observe(this, Observer { listResource ->
             if (listResource != null) {
-                Log.d("Gabriel", "onChanged on Status Response!!: ${listResource.status}")
                 if (listResource.data != null) {
                     when (listResource.status) {
                         ResourceData.Status.LOADING -> {
@@ -51,15 +53,16 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
                             }
                         }
                         ResourceData.Status.ERROR -> {
+                            Toast.makeText(this, "${listResource.message}", Toast.LENGTH_LONG).show()
                             mAdapter.hideLoading()
+
                             mAdapter.setRecipes(listResource.data.toMutableList())
-                            if (listResource.message.equals("No more results")) {
+                            if (listResource.message.equals("No more results...")) {
                                 mAdapter.setQueryExhausted()
                             }
                         }
 
                         ResourceData.Status.SUCCESS -> {
-                            Log.d("Gabriel", "onStatus success ${listResource.data.size} ")
                             mAdapter.hideLoading()
                             mAdapter.setRecipes(listResource.data.toMutableList())
                         }
@@ -96,6 +99,11 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
         recipeRecyclerView.addItemDecoration(itemDecorator)
         recipeRecyclerView.adapter = mAdapter
         recipeRecyclerView.layoutManager = LinearLayoutManager(this)
+        val preloader = RecyclerViewPreloader(
+            Glide.with(this),
+            mAdapter, viewPreloadSizeProvider, 30
+        )
+        recipeRecyclerView.addOnScrollListener(preloader)
         recipeRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 if (!recyclerView.canScrollVertically(1)
@@ -116,7 +124,6 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
     private fun initSearchView() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                mAdapter.displayLoading()
                 if (query != null) {
                     searchRecipesApi(query, 1)
                 }

@@ -41,7 +41,7 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(private val appE
     }
 
     /**
-     * 1) observe the local datab
+     * 1) observe the local database
      * 2) if <condition> then query the network
      * 3) stop observing the local db
      * 4) insert new data into local database
@@ -69,7 +69,7 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(private val appE
                     appExecutors.mDiskIO.execute {
                         //save the response to the local database
                         saveCallResult(processResponse(requestApiResponse))
-                        //We read again from the local data base
+                        //We request again a new live data
                         appExecutors.mainThreadExecutor.execute {
                             results.addSource(loadFromDb()) { newCacheObject ->
                                 setValueResource(ResourceData.success(newCacheObject))
@@ -81,8 +81,8 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(private val appE
                 is ApiEmptyResponse -> {
                     Log.d("Gabriel", "on ApiResponse Empty.")
                     appExecutors.mainThreadExecutor.execute {
-                        results.addSource(loadFromDb()) { newData ->
-                            setValueResource(ResourceData.success(newData))
+                        results.addSource(loadFromDb()) { cacheData ->
+                            setValueResource(ResourceData.success(cacheData))
                         }
                     }
 
@@ -90,8 +90,8 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(private val appE
 
                 is ApiErrorResponse -> {
                     Log.d("Gabriel", "on ApiResponse Error.")
-                    results.addSource(dbSource) { newData ->
-                        setValueResource(ResourceData.error(requestApiResponse.errorMessage, newData))
+                    results.addSource(dbSource) { cacheData ->
+                        setValueResource(ResourceData.error(requestApiResponse.errorMessage, cacheData))
                     }
                 }
             }

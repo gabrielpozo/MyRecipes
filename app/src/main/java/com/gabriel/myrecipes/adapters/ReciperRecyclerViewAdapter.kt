@@ -1,19 +1,25 @@
 package com.gabriel.myrecipes.adapters
 
+import android.text.TextUtils
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.bumptech.glide.ListPreloader
+import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.util.ViewPreloadSizeProvider
 import com.gabriel.myrecipes.R
 import com.gabriel.myrecipes.models.Recipe
 import com.gabriel.myrecipes.util.Constants
+import java.util.*
 
 class RecipeRecyclerViewAdapter(
     private val mOnRecipeListener: OnRecipeListener,
-    private val requestManager: RequestManager
+    private val requestManager: RequestManager,
+    private val preloadSizeProvider: ViewPreloadSizeProvider<String>
 ) :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    RecyclerView.Adapter<RecyclerView.ViewHolder>(), ListPreloader.PreloadModelProvider<String> {
     private var mRecipes: MutableList<Recipe>? = null
     private val recipeType = 1
     private val loadingType = 2
@@ -26,7 +32,7 @@ class RecipeRecyclerViewAdapter(
             recipeType -> {
                 view =
                     LayoutInflater.from(viewGroup.context).inflate(R.layout.layout_recipe_list_item, viewGroup, false)
-                return RecipeViewHolder(view, mOnRecipeListener, requestManager)
+                return RecipeViewHolder(view, mOnRecipeListener, requestManager, preloadSizeProvider)
             }
             loadingType -> {
                 view =
@@ -48,7 +54,7 @@ class RecipeRecyclerViewAdapter(
             else -> {
                 view =
                     LayoutInflater.from(viewGroup.context).inflate(R.layout.layout_recipe_list_item, viewGroup, false)
-                return RecipeViewHolder(view, mOnRecipeListener, requestManager)
+                return RecipeViewHolder(view, mOnRecipeListener, requestManager, preloadSizeProvider)
             }
         }
 
@@ -67,7 +73,6 @@ class RecipeRecyclerViewAdapter(
             recipes[position].social_rank.toInt() == -1 -> categoryType
             recipes[position].title == "LOADING..." -> loadingType
             recipes[position].title == "EXHAUSTED..." -> exhaustedType
-            position == (recipes.size - 1) && position != 0 && recipes[position].title != "EXHAUSTED..." -> loadingType
             else -> recipeType
         }
         value
@@ -76,7 +81,7 @@ class RecipeRecyclerViewAdapter(
     //display only loading during search request
     fun displayOnlyLoading() {
         clearRecipesList()
-        val recipe = Recipe("LOADING...")
+        val recipe = Recipe(title = "LOADING...")
         mRecipes?.add(recipe)
         notifyDataSetChanged()
     }
@@ -89,7 +94,7 @@ class RecipeRecyclerViewAdapter(
     //pagination loading
     fun displayLoading() {
         if (!isLoading()) {
-            val recipe = Recipe("LOADING...")
+            val recipe = Recipe(title = "LOADING...")
             mRecipes?.add(recipe)
             notifyDataSetChanged()
         }
@@ -97,7 +102,7 @@ class RecipeRecyclerViewAdapter(
 
     fun setQueryExhausted() {
         hideLoading()
-        val recipeExhausted = Recipe("EXHAUSTED...")
+        val recipeExhausted = Recipe(title = "EXHAUSTED...")
         mRecipes?.add(recipeExhausted)
         notifyDataSetChanged()
     }
@@ -110,6 +115,7 @@ class RecipeRecyclerViewAdapter(
                 } else if (recipes[recipes.size - 1].title == "LOADING...") {
                     recipes.removeAt(recipes.size - 1)
                 }
+                mRecipes = recipes
                 notifyDataSetChanged()
             }
 
@@ -166,5 +172,17 @@ class RecipeRecyclerViewAdapter(
     fun setRecipes(recipes: MutableList<Recipe>) {
         mRecipes = recipes
         notifyDataSetChanged()
+    }
+
+    override fun getPreloadItems(position: Int): MutableList<String> {
+        val url = mRecipes?.get(position)?.image_url
+        if (TextUtils.isEmpty(url)) {
+            Collections.emptyList<String>()
+        }
+        return Collections.singletonList(url)
+    }
+
+    override fun getPreloadRequestBuilder(item: String): RequestBuilder<*>? {
+        return requestManager.load(item)
     }
 }

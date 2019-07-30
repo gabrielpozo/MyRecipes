@@ -40,6 +40,7 @@ dependencies {
     //def room_version = '2.1.0'
     def room_version = "2.1.0" // 2.1.0 for latest stable version
 
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.0.0'
@@ -52,12 +53,11 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
+    //okhttp3
+    implementation("com.squareup.okhttp3:okhttp:4.0.1")
     //ViewModel and Live Data
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
     kapt 'androidx.lifecycle:lifecycle-compiler:2.0.0'
-   // implementation "android.arch.lifecycle:extensions:1.1.0"
-   // implementation "android.arch.lifecycle:viewmodel:1.1.0"
-
     //card view
     implementation 'androidx.cardview:cardview:1.0.0'
     //recycler view
@@ -65,14 +65,20 @@ dependencies {
     //glide
     implementation "com.github.bumptech.glide:glide:$glideVersion"
     annotationProcessor "com.github.bumptech.glide:compiler:$glideVersion"
+    implementation ("com.github.bumptech.glide:recyclerview-integration:$glideVersion") {
+        // Excludes the support library because it's already included by Glide.
+        transitive = false
+    }
     //design support library
     implementation 'com.google.android.material:material:1.0.0'
     //image-circle view
     implementation 'de.hdodenhof:circleimageview:3.0.0'
     //room
     implementation "androidx.room:room-ktx:$room_version"
-   // implementation "androidx.room:room-runtime:$room_version"
+    // implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
     // For Kotlin use kapt instead of annotationProcessor
+
+
 
 }
