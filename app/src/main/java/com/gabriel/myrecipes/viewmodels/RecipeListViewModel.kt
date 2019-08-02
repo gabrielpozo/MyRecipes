@@ -1,7 +1,6 @@
 package com.gabriel.myrecipes.viewmodels
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.*
 import com.gabriel.myrecipes.models.Recipe
 import com.gabriel.myrecipes.repositories.RecipeRepository
@@ -19,7 +18,6 @@ class RecipeListViewModel(application: Application) : AndroidViewModel(applicati
     var pageNumber: Int = 0
     private var query: String = ""
     private var cancelRequest = false
-    private var requestStartTime = 0L
 
 
     init {
@@ -44,18 +42,13 @@ class RecipeListViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private fun executeSearch() {
-        requestStartTime = System.currentTimeMillis()
         isPerformingQuery = true
         viewState.value = ViewState.RECIPES
         val repositorySource = recipeRepository.searchRecipes(query, pageNumber)
         recipes.addSource(repositorySource) { listResource ->
             if (!cancelRequest) {
-                //react to the data, do something before send it back to the UI
-                Log.d("Gabriel", "recipes.value -before assigining data-, data ${recipes.value?.data?.size}")
                 if (listResource != null) {
                     recipes.value = listResource
-                    Log.d("Gabriel", "listResource, data ${listResource.data?.size}")
-                    Log.d("Gabriel", "recipes.value, data ${recipes.value?.data?.size}")
                     when (listResource.status) {
                         ResourceData.Status.SUCCESS -> {
                             isPerformingQuery = false

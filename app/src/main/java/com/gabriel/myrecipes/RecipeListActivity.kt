@@ -68,7 +68,6 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
                             mAdapter.hideLoading()
                             mAdapter.setRecipes(listResource.data.toMutableList())
                         }
-
                     }
                 }
             }
@@ -92,7 +91,6 @@ class RecipeListActivity : BaseActivity(), OnRecipeListener {
             .error(R.drawable.white_background)
         return Glide.with(this)
             .setDefaultRequestOptions(options)
-
     }
 
     private fun initRecyclerView() {

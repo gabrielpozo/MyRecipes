@@ -66,10 +66,10 @@ abstract class NetworkBoundResource<CacheObject, RequestObject>(private val appE
                         //We request again a new live data
                         appExecutors.mainThreadExecutor.execute {
                             results.addSource(loadFromDb()) { newCacheObject ->
-                                if (!isApiCallExhausted(requestApiResponse.body)) {
-                                    setValueResource(ResourceData.success(newCacheObject))
-                                } else {
+                                if (isApiCallExhausted(requestApiResponse.body)) {
                                     setValueResource(ResourceData.exhausted(newCacheObject))
+                                } else {
+                                    setValueResource(ResourceData.success(newCacheObject))
                                 }
                             }
                         }

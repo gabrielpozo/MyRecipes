@@ -71,8 +71,7 @@ class RecipeRepository(context: Context) {
             override fun shouldFetch(data: Recipe?): Boolean {
                 val currentTime = (System.currentTimeMillis() / 1000).toInt()
                 if (data != null) {
-                    val lastRefresh = data.timestamp
-                    if ((currentTime - lastRefresh) >= Constants.recipe_refresh_time) {
+                    if ((currentTime - data.timestamp) >= Constants.recipe_refresh_time) {
                         return true
                     }
                 }
